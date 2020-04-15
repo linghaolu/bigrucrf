@@ -61,7 +61,7 @@ def train(use_cuda, save_dirname=None, is_local=True):
             dataset.train(), batch_size=BATCH_SIZE)
     else:
         train_data = paddle.batch(
-            paddle.reader.shuffle(dataset.train(), buf_size=1024),
+            paddle.reader.shuffle(dataset.train(), buf_size=4096),
             batch_size=BATCH_SIZE)
 
     place = fluid.CUDAPlace(0) if use_cuda else fluid.CPUPlace()
@@ -79,7 +79,7 @@ def train(use_cuda, save_dirname=None, is_local=True):
         start_time = time.time()
         batch_id = 0
         for pass_id in six.moves.xrange(PASS_NUM):
-            print("------")
+            print("pass : %s" % pass_id)
             for data in train_data():
                 cost = exe.run(
                     main_program, feed=feeder.feed(data), fetch_list=[avg_cost])
@@ -98,7 +98,7 @@ def train(use_cuda, save_dirname=None, is_local=True):
                         if save_dirname is not None:
                             # TODO(liuyiqun): Change the target to crf_decode
                             fluid.io.save_inference_model(save_dirname, ['word_data'], 
-                                    crf_decode, exe)
+                                    crf_decode, exe, params_filename="__params__")
                         #return
 
                 batch_id = batch_id + 1

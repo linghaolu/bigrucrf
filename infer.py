@@ -48,7 +48,7 @@ def infer(use_cuda, save_dirname=None):
         inference_program = fluid.default_main_program()
         word = fluid.data(name='word_data', shape=[None, 1], dtype='int64', lod_level=1)
         crf_decode = nets.lex_net(word, None, word_dict_len, label_dict_len, for_infer=True, target=None)
-        fluid.io.load_persistables(exe, save_dirname, inference_program)
+        fluid.io.load_persistables(exe, save_dirname, inference_program, filename="__params__")
 
         testdata = dataset.train()().next()
 	data = testdata[0]
