@@ -33,8 +33,8 @@ def lex_net(word, args, vocab_size, num_labels, for_infer=True, target=None):
     """
     word_emb_dim = 32 #args.word_emb_dim
     grnn_hidden_dim = 256 #args.grnn_hidden_dim
-    emb_lr = 1.0  #args.emb_learning_rate if 'emb_learning_rate' in dir(args) else 1.0
-    crf_lr = 0.001 # args.emb_learning_rate if 'crf_learning_rate' in dir(args) else 1.0
+    emb_lr = 2.0  #args.emb_learning_rate if 'emb_learning_rate' in dir(args) else 1.0
+    crf_lr = 0.2 # args.emb_learning_rate if 'crf_learning_rate' in dir(args) else 1.0
     bigru_num = 2 # args.bigru_num
     init_bound = 0.1
     IS_SPARSE = True

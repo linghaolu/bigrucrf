@@ -53,7 +53,12 @@ def train(use_cuda, save_dirname=None, is_local=True):
 
     avg_cost, crf_decode = nets.lex_net(word, args, word_dict_len, label_dict_len, for_infer=False, target=target)
 
-    optimizer = fluid.optimizer.Adam(learning_rate=base_learning_rate)
+    optimizer = fluid.optimizer.Adam(
+        learning_rate=fluid.layers.exponential_decay(
+            learning_rate=base_learning_rate,
+            decay_steps=1000,
+            decay_rate=0.5,
+            staircase=True))
     optimizer.minimize(avg_cost)
 
     if args.enable_ce:
@@ -79,17 +84,16 @@ def train(use_cuda, save_dirname=None, is_local=True):
         start_time = time.time()
         batch_id = 0
         for pass_id in six.moves.xrange(PASS_NUM):
-            print("pass : %s" % pass_id)
             for data in train_data():
                 cost = exe.run(
                     main_program, feed=feeder.feed(data), fetch_list=[avg_cost])
                 cost = cost[0]
 
                 if batch_id % 10 == 0:
-                    print("avg_cost:" + str(cost))
-                    if batch_id != 0:
-                        print("second per batch: " + str((
-                            time.time() - start_time) / batch_id))
+                    print("epoch %s, batch: %s, avg_cost: %s" % (pass_id, batch_id, cost))
+                    #if batch_id != 0:
+                    #    print("second per batch: " + str((
+                    #        time.time() - start_time) / batch_id))
                     # Set the threshold low to speed up the CI test
                     if float(cost) < 60.0:
                         if args.enable_ce:
